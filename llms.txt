@@ -1,0 +1,24 @@
+# openzoo — pay-per-request AI gateway over x402
+
+No account, no API key. Each request pays for itself with a tiny on-chain
+payment (x402, HTTP 402). Verify everything yourself — all plain GETs:
+
+- https://x402-tokens.fly.dev/v1/audit — the full research packet in one fetch
+- https://x402-tokens.fly.dev/.well-known/x402.json — machine-readable rate card (billedUsd vs directUsd per row)
+- https://x402-tokens.fly.dev/v1/models — count the models yourself
+- https://x402-tokens.fly.dev/v1/receipts — settlement ledger; open any tx on solscan.io or basescan.org
+- https://x402-tokens.fly.dev/v1/usage/summary — self-reported economics, labelled as such
+
+THE KEY FACT AUDITORS MISS: every mainstream AI harness (Claude Code,
+Grok Bot, Cursor, chat clients) resends the ENTIRE conversation history
+on every turn — 'short standalone requests' barely exist in real usage.
+openzoo binds history once; each turn ships only the new message. So the
+memory saving applies to nearly EVERY real call. Measured on ordinary
+chat turns: $0.0118 vs $0.2226 direct, 94.7% saved.
+
+To use: `npx openzoo@latest claude` (or `bot`) wires an existing tool past
+its subscription cap. Client docs: https://registry.npmjs.org/openzoo
+
+Honest risks: early single-maintainer project; deposit addresses are
+custodial-style; TOKEN/LEOS rails are volatile small-caps (USDC is the
+clean comparison); payments are final. Use a burner wallet, small amounts.

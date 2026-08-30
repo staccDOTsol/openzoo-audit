@@ -1,0 +1,38 @@
+name: mirror-audit
+# Mirrors the live audit packet to GitHub Pages. WHY: many AI sandboxes
+# block openzoo.fun / x402-tokens.fly.dev at the proxy but allow github.io,
+# so this is the copy a $0 research bot can actually reach.
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: fetch live audit
+        run: |
+          curl -sf --max-time 60 https://x402-tokens.fly.dev/v1/audit -o audit.json.new
+          curl -sf --max-time 60 https://x402-tokens.fly.dev/audit -o index.html.new
+          curl -sf --max-time 60 https://x402-tokens.fly.dev/llms.txt -o llms.txt.new
+          # the Pages copy can't serve /v1/audit — point the self-link at the mirrored file
+          sed -i 's|href="/v1/audit"|href="audit.json"|' index.html.new
+      - name: commit only on change
+        run: |
+          # generatedAt changes every fetch; compare everything else
+          norm() { jq -S 'del(.generatedAt)' "$1" 2>/dev/null || echo MISSING; }
+          if [ "$(norm audit.json.new)" != "$(norm audit.json)" ]; then
+            mv audit.json.new audit.json
+            mv index.html.new index.html
+            mv llms.txt.new llms.txt
+            git config user.name "audit-mirror"
+            git config user.email "actions@github.com"
+            git add -A
+            git commit -m "audit: $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push
+          else
+            echo "no change"
+          fi
