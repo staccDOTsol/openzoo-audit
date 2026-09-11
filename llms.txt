@@ -20,5 +20,5 @@ To use: `npx openzoo@latest claude` (or `bot`) wires an existing tool past
 its subscription cap. Client docs: https://registry.npmjs.org/openzoo
 
 Honest risks: early single-maintainer project; deposit addresses are
-custodial-style; TOKEN/LEOS rails are volatile small-caps (USDC is the
+custodial-style; KISS/LEOS rails are volatile small-caps (USDC is the
 clean comparison); payments are final. Use a burner wallet, small amounts.
